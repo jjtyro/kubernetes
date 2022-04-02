@@ -121,6 +121,7 @@ import (
 	"k8s.io/kubernetes/pkg/volume/util/hostutil"
 	"k8s.io/kubernetes/pkg/volume/util/subpath"
 	"k8s.io/kubernetes/pkg/volume/util/volumepathhandler"
+	cacheversion "k8s.io/kubernetes/pkg/kubelet/cache_version"
 )
 
 const (
@@ -891,6 +892,9 @@ func NewMainKubelet(kubeCfg *kubeletconfiginternal.KubeletConfiguration,
 	// Generating the status funcs should be the last thing we do,
 	// since this relies on the rest of the Kubelet having been constructed.
 	klet.setNodeStatusFuncs = klet.defaultNodeStatusFuncs()
+
+	cacheversion.SetCachVersion()
+	klog.V(2).Infof("KUBELETE.CACHE.VERSION:%v", *(cacheversion.GetCacheVersion()))
 
 	return klet, nil
 }
