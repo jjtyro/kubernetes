@@ -5,6 +5,7 @@ package fs
 import (
 	"bufio"
 	"fmt"
+	"github.com/golang/glog"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -43,12 +44,15 @@ func (s *MemoryGroup) Apply(d *cgroupData) (err error) {
 			if err := os.MkdirAll(path, 0755); err != nil {
 				return err
 			}
-			// Only enable kernel memory accouting when this cgroup
-			// is created by libcontainer, otherwise we might get
-			// error when people use `cgroupsPath` to join an existed
-			// cgroup whose kernel memory is not initialized.
-			if err := EnableKernelMemoryAccounting(path); err != nil {
-				return err
+			if d.config.KernelMemory != 0 {
+				glog.Warningf("Enable kernel memory accounting, KernelMemory: %v.", d.config.KernelMemory)
+				// Only enable kernel memory accouting when this cgroup
+				// is created by libcontainer, otherwise we might get
+				// error when people use `cgroupsPath` to join an existed
+				// cgroup whose kernel memory is not initialized.
+				if err := EnableKernelMemoryAccounting(path); err != nil {
+					return err
+				}
 			}
 		}
 	}
