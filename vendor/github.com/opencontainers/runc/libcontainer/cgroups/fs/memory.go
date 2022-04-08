@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	cgroupKernelMemoryLimit = "memory.kmem.limit_in_bytes"
-	cgroupMemorySwapLimit   = "memory.memsw.limit_in_bytes"
-	cgroupMemoryLimit       = "memory.limit_in_bytes"
+	//cgroupKernelMemoryLimit = "memory.kmem.limit_in_bytes"
+	cgroupMemorySwapLimit = "memory.memsw.limit_in_bytes"
+	cgroupMemoryLimit     = "memory.limit_in_bytes"
 )
 
 type MemoryGroup struct {
