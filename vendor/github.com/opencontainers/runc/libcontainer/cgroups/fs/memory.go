@@ -6,17 +6,12 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/golang/glog"
-	"io/ioutil"
+	"github.com/opencontainers/runc/libcontainer/cgroups"
+	"github.com/opencontainers/runc/libcontainer/configs"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall" // only for Errno
-
-	"github.com/opencontainers/runc/libcontainer/cgroups"
-	"github.com/opencontainers/runc/libcontainer/configs"
-
-	"golang.org/x/sys/unix"
 )
 
 const (
@@ -72,6 +67,7 @@ func (s *MemoryGroup) Apply(d *cgroupData) (err error) {
 }
 
 func EnableKernelMemoryAccounting(path string) error {
+	/** for disable Kernel memory accounting
 	// Check if kernel memory is enabled
 	// We have to limit the kernel memory here as it won't be accounted at all
 	// until a limit is set on the cgroup and limit cannot be set once the
@@ -81,10 +77,12 @@ func EnableKernelMemoryAccounting(path string) error {
 			return err
 		}
 	}
+	**/
 	return nil
 }
 
 func setKernelMemory(path string, kernelMemoryLimit int64) error {
+	/** for disable Kernel memory accounting
 	if path == "" {
 		return fmt.Errorf("no such directory for %s", cgroupKernelMemoryLimit)
 	}
@@ -106,6 +104,7 @@ func setKernelMemory(path string, kernelMemoryLimit int64) error {
 		}
 		return fmt.Errorf("failed to write %v to %v: %v", kernelMemoryLimit, cgroupKernelMemoryLimit, err)
 	}
+	**/
 	return nil
 }
 
