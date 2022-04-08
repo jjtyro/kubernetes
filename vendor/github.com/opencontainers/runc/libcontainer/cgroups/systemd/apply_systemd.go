@@ -5,7 +5,6 @@ package systemd
 import (
 	"errors"
 	"fmt"
-	"github.com/golang/glog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -542,8 +541,6 @@ func getUnitName(c *configs.Cgroup) string {
 
 func setKernelMemory(c *configs.Cgroup) error {
 	path, err := getSubsystemPath(c, "memory")
-	glog.Warningf("apply_systemd.go setKernelMemory: %v.", path)
-
 	if err != nil && !cgroups.IsNotFound(err) {
 		return err
 	}
