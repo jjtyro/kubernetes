@@ -5,6 +5,7 @@ package fs
 import (
 	"bufio"
 	"fmt"
+	"k8s.io/klog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -33,12 +34,15 @@ func (s *MemoryGroupV2) Apply(d *cgroupData) (err error) {
 			if err := os.MkdirAll(path, 0755); err != nil {
 				return err
 			}
-			// Only enable kernel memory accouting when this cgroup
-			// is created by libcontainer, otherwise we might get
-			// error when people use `cgroupsPath` to join an existed
-			// cgroup whose kernel memory is not initialized.
-			if err := EnableKernelMemoryAccounting(path); err != nil {
-				return err
+			if d.config.KernelMemory != 0 {
+				klog.Warningf("Enable kernel memory accounting, KernelMemory: %v.", d.config.KernelMemory)
+				// Only enable kernel memory accouting when this cgroup
+				// is created by libcontainer, otherwise we might get
+				// error when people use `cgroupsPath` to join an existed
+				// cgroup whose kernel memory is not initialized.
+				if err := EnableKernelMemoryAccounting(path); err != nil {
+					return err
+				}
 			}
 		}
 	}
