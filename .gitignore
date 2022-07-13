@@ -105,6 +105,7 @@ kubernetes.tar.gz
 
 # Phony test files used as part of coverage generation
 zz_generated_*_test.go
+zz_generated.*
 
 # make-related metadata
 /.make/
