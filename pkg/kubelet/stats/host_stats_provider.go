@@ -106,6 +106,10 @@ func (h hostStatsProvider) getPodEtcHostsStats(podUID types.UID, rootFsInfo *cad
 
 func (h hostStatsProvider) podLogMetrics(podNamespace, podName string, podUID types.UID) (metricsProviderByPath, error) {
 	podLogsDirectoryPath := kuberuntime.BuildPodLogsDirectory(podNamespace, podName, podUID)
+	_, err := h.osInterface.Stat(podLogsDirectoryPath)
+	if err != nil {
+		podLogsDirectoryPath = kuberuntime.BuildPodLogsDirectoryForwardCompatible(podNamespace, podName, podUID)
+	}
 	return h.fileMetricsByDir(podLogsDirectoryPath)
 }
 

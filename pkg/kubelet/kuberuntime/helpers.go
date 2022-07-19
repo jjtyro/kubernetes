@@ -180,6 +180,11 @@ func BuildPodLogsDirectory(podNamespace, podName string, podUID types.UID) strin
 		string(podUID)}, logPathDelimiter))
 }
 
+// BuildPodLogsDirectoryForwardCompatible builds absolute log directory path for a early version pod sandbox.
+func BuildPodLogsDirectoryForwardCompatible(podNamespace, podName string, podUID types.UID) string {
+	return filepath.Join(podLogsRootDirectory, string(podUID))
+}
+
 // parsePodUIDFromLogsDirectory parses pod logs directory name and returns the pod UID.
 // It supports both the old pod log directory /var/log/pods/UID, and the new pod log
 // directory /var/log/pods/NAMESPACE_NAME_UID.

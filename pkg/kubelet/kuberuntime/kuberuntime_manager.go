@@ -19,6 +19,7 @@ package kuberuntime
 import (
 	"errors"
 	"fmt"
+	"k8s.io/component-base/version"
 	"os"
 	goruntime "runtime"
 	"time"
@@ -43,6 +44,7 @@ import (
 	"k8s.io/kubernetes/pkg/credentialprovider"
 	"k8s.io/kubernetes/pkg/credentialprovider/plugin"
 	"k8s.io/kubernetes/pkg/features"
+	cacheversion "k8s.io/kubernetes/pkg/kubelet/cache_version"
 	"k8s.io/kubernetes/pkg/kubelet/cm"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 	"k8s.io/kubernetes/pkg/kubelet/events"
@@ -520,6 +522,14 @@ func (m *kubeGenericRuntimeManager) podSandboxChanged(pod *v1.Pod, podStatus *ku
 }
 
 func containerChanged(container *v1.Container, containerStatus *kubecontainer.Status) (uint64, uint64, bool) {
+	if validity := cacheversion.CheckValidity(); validity {
+		rt := containerStatus.StartedAt.Unix()
+		if (cacheversion.CurrentVersion() != cacheversion.HistoryVersion()) &&
+			rt < cacheversion.CurrentVersionStartTime() {
+			klog.V(2).Infof("SKIP.CONTAINER-ID:%s, NAME:%s", containerStatus.ID, containerStatus.Name)
+			return containerStatus.Hash, containerStatus.Hash, false
+		}
+	}
 	expectedHash := kubecontainer.HashContainer(container)
 	return expectedHash, containerStatus.Hash, containerStatus.Hash != expectedHash
 }
@@ -539,6 +549,7 @@ func containerSucceeded(c *v1.Container, podStatus *kubecontainer.PodStatus) boo
 // computePodActions checks whether the pod spec has changed and returns the changes if true.
 func (m *kubeGenericRuntimeManager) computePodActions(pod *v1.Pod, podStatus *kubecontainer.PodStatus) podActions {
 	klog.V(5).InfoS("Syncing Pod", "pod", klog.KObj(pod))
+	klog.V(2).Infof("SyncPod.CACHE.VERSION:%v", version.Get())
 
 	createPodSandbox, attempt, sandboxID := m.podSandboxChanged(pod, podStatus)
 	changes := podActions{

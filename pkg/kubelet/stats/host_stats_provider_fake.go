@@ -51,6 +51,10 @@ func NewFakeHostStatsProviderWithData(fakeStats map[string]*volume.Metrics, osIn
 
 func (f *fakeHostStatsProvider) getPodLogStats(podNamespace, podName string, podUID types.UID, rootFsInfo *cadvisorapiv2.FsInfo) (*statsapi.FsStats, error) {
 	path := kuberuntime.BuildPodLogsDirectory(podNamespace, podName, podUID)
+	_, err := f.osInterface.Stat(path)
+	if err != nil {
+		path = kuberuntime.BuildPodLogsDirectoryForwardCompatible(podNamespace, podName, podUID)
+	}
 	files, err := f.osInterface.ReadDir(path)
 	if err != nil {
 		return nil, err

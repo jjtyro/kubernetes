@@ -66,6 +66,7 @@ import (
 	"k8s.io/kubernetes/pkg/features"
 	kubeletconfiginternal "k8s.io/kubernetes/pkg/kubelet/apis/config"
 	"k8s.io/kubernetes/pkg/kubelet/apis/podresources"
+	cacheversion "k8s.io/kubernetes/pkg/kubelet/cache_version"
 	"k8s.io/kubernetes/pkg/kubelet/cadvisor"
 	kubeletcertificate "k8s.io/kubernetes/pkg/kubelet/certificate"
 	"k8s.io/kubernetes/pkg/kubelet/cloudresource"
@@ -879,6 +880,9 @@ func NewMainKubelet(kubeCfg *kubeletconfiginternal.KubeletConfiguration,
 	// Generating the status funcs should be the last thing we do,
 	// since this relies on the rest of the Kubelet having been constructed.
 	klet.setNodeStatusFuncs = klet.defaultNodeStatusFuncs()
+
+	cacheversion.SetCachVersion()
+	klog.V(2).Infof("KUBELETE.CACHE.VERSION:%v", *(cacheversion.GetCacheVersion()))
 
 	return klet, nil
 }
